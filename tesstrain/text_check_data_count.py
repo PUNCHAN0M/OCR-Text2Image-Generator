@@ -51,7 +51,7 @@ def check_empty_box_files(folder_path):
     return empty_files
 
 # ตัวอย่างการใช้งาน
-folder_path = "E:/Project/Tesseract-FineTuning/tesstrain/data/DilleniaUPC2-ground-truth"  # แทนที่ด้วย path ของโฟลเดอร์ที่ต้องการตรวจสอบ
+folder_path = "E:/Project/Tesseract-FineTuning/tesstrain/data/DilleniaUPC-ground-truth"  # แทนที่ด้วย path ของโฟลเดอร์ที่ต้องการตรวจสอบ
 empty_files = check_empty_box_files(folder_path)
 
 if empty_files:

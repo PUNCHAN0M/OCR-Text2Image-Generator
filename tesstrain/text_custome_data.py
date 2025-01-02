@@ -11,7 +11,7 @@ import pandas as pd  # ใช้ pandas สำหรับอ่านไฟล�
 """============================= File Path ============================="""
 # input train data
 training_text_file = 'langdata/langdata_lstm/tha/tha.training_text'     # input train data
-output_directory = 'tesstrain/data/DilleniaUPC2-ground-truth'            # output file .tif .txt .box
+output_directory = 'tesstrain/data/DilleniaUPC3-ground-truth'            # output file .tif .txt .box
 
 def data_from_tesseract_dataset():
     global training_text_file
@@ -91,6 +91,12 @@ def create_salt_pepper(file_base_name):
         height_size = random.randint(0,3)
         kernel = np.ones((width_size,height_size), np.uint8)
         image = cv2.erode(image, kernel, iterations=1)
+        
+        angle = random_angle = random.uniform(-1, 1)  # องศาที่ต้องการหมุน
+        (h, w) = image.shape[:2]
+        center = (w // 2, h // 2)
+        rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+        image = cv2.warpAffine(image, rotation_matrix, (w, h))
 
         cv2.imwrite(image_path, image)
 
@@ -145,7 +151,6 @@ def text2image(file_base_name,line_training_text):
         '--unicharset_file=langdata/tha.unicharset',                            # anumber of unchar 
     ])
    
-
 
 
 """============================= Generate Function ============================="""
@@ -217,13 +222,13 @@ def generate_image_from_date(amount_group_date= 30,define_count=None) :
         line_count += 1
 
 
-def generate_image_from_excel(group_size=8, define_count=None):
+def generate_image_from_excel(group_size=1, define_count=None):
     """import global"""
     global line_count
     global output_directory
     global count
 
-    group_size = random.randint(6,8)
+    # group_size = random.randint(6,8)
     try:
         df = pd.read_excel(excel_file, sheet_name=sheet_name)
     except Exception as e:
@@ -231,7 +236,7 @@ def generate_image_from_excel(group_size=8, define_count=None):
         return
 
     # รวมคอลัมน์ที่ต้องการเป็น 1 บรรทัด
-    df['combined_text'] = df['TambonThai'] + ' ' + df['TambonThaiShort'] + ' ' + df['DistrictThai'] + ' ' + df['DistrictThaiShort'] + ' ' + df['ProvinceThai'] + ' ' + df['PostCodeMain'].astype(str) + ' ' + df['PostCodeAll'].astype(str)
+    df['combined_text'] =   'ซ.' + df['DistrictThaiShort']+' ' +'ถ.' + df['TambonThaiShort'] +  " "+df['TambonThai'] + " " + df['DistrictThai'] + ' ' + df['ProvinceThai'] + ' ' 
     
     # ลบค่าที่ว่างและแปลงเป็น list
     lines = df['combined_text'].dropna().tolist()
@@ -250,10 +255,9 @@ def generate_image_from_excel(group_size=8, define_count=None):
     for line in lines:
         random_part1 = f"ที่อยู่ {random.randint(1, 99)}/{random.randint(1, 99)}"
         random_part2 = f"หมู่ {random.randint(1, 100)}"
-        additional_parts = f"ถ. ซ."
-        enhanced_line = f"{line}{random_part1}/{random_part2}{additional_parts}"
+        # additional_parts = f"ถ. ซ."
+        enhanced_line = f"{random_part1} {random_part2} {line}"
         enhanced_lines.append(enhanced_line)
-
     # สุ่มข้อมูล
     random.shuffle(enhanced_lines)
 
@@ -350,17 +354,16 @@ def generate_image_from_sara(amount_group=100,define_count=None):
         line_count += 1
 
 
-
 def main():
-    generate_image_from_tesseract_dataset()
+    # generate_image_from_tesseract_dataset()
 
     # generate_image_from_date()
 
     # generate_image_from_excel() 
 
-    # generate_image_from_sara()
+    generate_image_from_sara()
 
 if __name__ == '__main__':
-    count = 1
-    line_count = 1283
+    count = 1000
+    line_count = 6000
     main()
